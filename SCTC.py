@@ -1,10 +1,11 @@
 #!/usr/bin/env Python3
 import PySimpleGUI as sg
 import os
+import socket
 #from subprocess import *
 
 
-# ----------- V2 -------------
+# ----------- V4 -------------
 
 # build exe
 # pyinstaller -wF -F --uac-admin --uac-uiaccess SCTC.py
@@ -14,11 +15,41 @@ import os
 #pip uninstall
 #pip install --no-cache-dir --upgrade
 
+
 sg.change_look_and_feel('Reddit')
+def testConnection(assetname):
+    try:
+        ip = socket.gethostbyname(assetname)
+        return ip
+
+        # dns = socket.gethostbyaddr(assetname)
+        # hostname = dns[0]
+        # if (hostname.lower() == assetname.lower()) or (hostname.lower() == append_corpads(assetname).lower()):
+        #     return hostname
+
+        # DNS keeps returning different ip
+        # i gave up
+
+        # elif (dns[2][0] == assetname):
+        #     return hostname
+        # else:
+        #     return "DNS returned wrong IP"
+
+    except:
+        return "Can't connect"
+
+
+
 
 # ------ Menu Definition ------ #
 menu_def = [['File', ['Exit']],
             ['Help', 'go/wasd'], ]
+
+# ------ Power Frame Definition ------ #
+frame_layout = [
+                [sg.Text('SHTDN:', pad=(0,1), font='Default 10 bold'), sg.Button('Now', pad=(0,1), key='shutdown_now'), sg.Button('5 min', pad=(0,1), key='shutdown_5min'), sg.Button('/F', pad=(0,1), key='shutdown_f')],
+                [sg.Text('RSTRT:', pad=(0,1), font='Default 10 bold'), sg.Button('Now', pad=(0,1), key='reboot_now'), sg.Button('5 min', pad=(0,1), key='reboot_5min'), sg.Button('/F', pad=(0,1), key='reboot_f')]
+                ]
 # ------ Column Definition ------ #
 counter = 1
 column1 = [[sg.Button('MSRA', pad=((2,2),1)), sg.Button('Browse', pad=((2,2),1)), sg.Button('Ping', pad=((2,2),1))],
@@ -26,12 +57,17 @@ column1 = [[sg.Button('MSRA', pad=((2,2),1)), sg.Button('Browse', pad=((2,2),1))
            [sg.Button('NsLookup', pad=((2,2),1)), sg.Button('Getmac', pad=((2,2),1))],
            [sg.Button('Send msg', pad=((2,2),1)), sg.InputText(size=(7,1))],
            [sg.Button('Run cmd', pad=((2,2),1)), sg.InputText(size=(8,1))],
-           [sg.Button('Reboot', pad=((2,2),1)), sg.Button('Shutdown', pad=((2,2),1))],
-           [sg.Button('Force Reboot', pad=((2,2),1)), sg.Button('Clicky',pad=((0,0),0), key='btnADHD')]]
+           [sg.Frame('', frame_layout, pad=(0,2))]
+           #[sg.Button('Reboot', pad=((2,2),1)), sg.Button('Shutdown', pad=((2,2),1))],
+           #[sg.Button('Force Reboot', pad=((2,2),1)), sg.Button('Clicky',pad=((0,0),0), key='btnADHD')]
+           ]
+
+
 
 layout = [[sg.Menu(menu_def, tearoff=True)],
           [sg.Text('Asset Number or IP address:')],
           [sg.InputText(size=(12, 3)), sg.Checkbox('Append ".corp.ads"', default=True)],
+          [sg.Button('Test Connection', key='test_connection'), sg.Text('                           ', key='test_ip')],
           [sg.Text('Remote Desktop Connection:')],
           [sg.Button('Standard', key='Standard', size=(10, 3)), sg.Button('Old Asset', size=(10, 3), disabled=True, key='btnOld'), sg.Button('New Asset', size=(10, 3), disabled=True, key='btnNew')],
           [sg.Checkbox('Faster Logon', default=True), sg.Checkbox('Automate PCmover Migration', default=False, enable_events=True, disabled=False)],
@@ -45,7 +81,7 @@ layout = [[sg.Menu(menu_def, tearoff=True)],
               [sg.Button('Task Scheduler', size=(18,1), pad=((0,0),0))]], title='Administrative Tools', relief=sg.RELIEF_SUNKEN, tooltip=':)', background_color='#c8c8c8'), sg.Column(column1)],
           [sg.Text("Note: This tool must be ran with functional ID")]]
 
-window = sg.Window('Service Center Technician Console', layout)
+window = sg.Window('Service Center Technician Console V4', layout)
 
 while True:                             # The Event Loop
     event, values = window.read()
@@ -74,11 +110,16 @@ while True:                             # The Event Loop
     if event in (None, 'Quit'):
         break
 
-    # adhd
-    if event == "btnADHD":
-        #print("test")
-        counter = counter+counter
-        window['btnADHD'].update(text=counter)
+    # if no asset number
+    if event == 'test_connection' and not values[1]:
+        pass
+    elif event == 'test_connection' and values[1]:
+        hostip = testConnection(values[1])
+        window['test_ip'].update(hostip)
+        if hostip == ("Can't connect" or 'DNS returned wrong IP'):
+            window['test_ip'].update(background_color='red')
+        else:
+            window['test_ip'].update(background_color='#00FF00')
 
 
     # if no asset number
@@ -241,21 +282,35 @@ while True:                             # The Event Loop
         except:
             pass
 
-    if event == "Reboot":
-        try:
-            os.system('start cmd /c shutdown /r /m \\\\' + values[1] + ' /t 01')
-        except:
-            pass
-
-    if event == "Shutdown":
+    if event == "shutdown_now":
         try:
             os.system('start cmd /c shutdown /s /m \\\\' + values[1] + ' /t 01')
         except:
             pass
-
-    if event == "Force Reboot":
+    if event == "shutdown_5min":
         try:
-            os.system('start cmd /c shutdown /r /f /m \\\\' + values[1] + ' /t 01')
+            os.system('start cmd /c shutdown /s /m \\\\' + values[1] + ' /t 300')
+        except:
+            pass
+    if event == "shutdown_f":
+        try:
+            os.system('start cmd /c shutdown /s /f /m \\\\' + values[1] + ' /t 0')
+        except:
+            pass
+
+    if event == "reboot_now":
+        try:
+            os.system('start cmd /c shutdown /r /m \\\\' + values[1] + ' /t 01')
+        except:
+            pass
+    if event == "reboot_5min":
+        try:
+            os.system('start cmd /c shutdown /r /m \\\\' + values[1] + ' /t 300')
+        except:
+            pass
+    if event == "reboot_f":
+        try:
+            os.system('start cmd /c shutdown /r /f /m \\\\' + values[1] + ' /t 0')
         except:
             pass
 
