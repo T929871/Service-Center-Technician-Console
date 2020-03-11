@@ -22,7 +22,8 @@ def testConnection(assetname):
         ip = socket.gethostbyname(assetname)
         return ip
 
-        # dns = socket.gethostbyaddr(assetname)
+        #dns = socket.gethostbyaddr(assetname)
+
         # hostname = dns[0]
         # if (hostname.lower() == assetname.lower()) or (hostname.lower() == append_corpads(assetname).lower()):
         #     return hostname
@@ -55,8 +56,8 @@ counter = 1
 column1 = [[sg.Button('MSRA', pad=((2,2),1)), sg.Button('Browse', pad=((2,2),1)), sg.Button('Ping', pad=((2,2),1))],
            [sg.Button('See Logged in Users', pad=((2,2),1))], #query user /server:
            [sg.Button('NsLookup', pad=((2,2),1)), sg.Button('Getmac', pad=((2,2),1))],
-           [sg.Button('Send msg', pad=((2,2),1)), sg.InputText(size=(7,1))],
-           [sg.Button('Run cmd', pad=((2,2),1)), sg.InputText(size=(8,1))],
+           [sg.Button('Send msg', pad=((2,2),1)), sg.InputText(size=(10,1))],
+           [sg.Button('Run cmd', pad=((2,2),1)), sg.InputText(size=(11,1))],
            [sg.Frame('', frame_layout, pad=(0,2))]
            #[sg.Button('Reboot', pad=((2,2),1)), sg.Button('Shutdown', pad=((2,2),1))],
            #[sg.Button('Force Reboot', pad=((2,2),1)), sg.Button('Clicky',pad=((0,0),0), key='btnADHD')]
@@ -66,7 +67,7 @@ column1 = [[sg.Button('MSRA', pad=((2,2),1)), sg.Button('Browse', pad=((2,2),1))
 
 layout = [[sg.Menu(menu_def, tearoff=True)],
           [sg.Text('Asset Number or IP address:')],
-          [sg.InputText(size=(12, 3)), sg.Checkbox('Append ".corp.ads"', default=True)],
+          [sg.InputText(size=(15, 3)), sg.Checkbox('Append ".corp.ads"', default=True)],
           [sg.Button('Test Connection', key='test_connection'), sg.Text('                           ', key='test_ip')],
           [sg.Text('Remote Desktop Connection:')],
           [sg.Button('Standard', key='Standard', size=(10, 3)), sg.Button('Old Asset', size=(10, 3), disabled=True, key='btnOld'), sg.Button('New Asset', size=(10, 3), disabled=True, key='btnNew')],
